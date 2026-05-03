@@ -171,9 +171,14 @@ def print_json(report: ReconReport):
         
     print(json.dumps(out, indent=2))
 
+def version_callback(value: bool):
+    if value:
+        print("scraperecon v0.1.0")
+        raise typer.Exit()
+
 @app.command()
 def main(
-    url: str = typer.Argument(..., help="Target URL"),
+    url: str = typer.Argument(None, help="Target URL"),
     probe_rate: bool = typer.Option(False, "--probe-rate", help="Run stage 4 (rate limit probe)"),
     concurrency: int = typer.Option(5, "--concurrency", help="Workers for rate probe"),
     requests: int = typer.Option(20, "--requests", help="Total requests for rate probe"),
@@ -183,11 +188,11 @@ def main(
     skip_tls: bool = typer.Option(False, "--skip-tls", help="Skip stage 2"),
     skip_vendor: bool = typer.Option(False, "--skip-vendor", help="Skip stage 3"),
     save: bool = typer.Option(False, "--save", help="Save the full HTML responses to local files"),
-    version: bool = typer.Option(False, "--version", help="Print version")
+    version: bool = typer.Option(None, "--version", callback=version_callback, is_eager=True, help="Print version")
 ):
-    if version:
-        print("scraperecon v0.1.0")
-        raise typer.Exit()
+    if not url:
+        print("Usage: scraperecon [OPTIONS] URL\nTry 'scraperecon --help' for help.\n\nError: Missing argument 'URL'.", file=sys.stderr)
+        raise typer.Exit(1)
         
     report = run_pipeline(
         url=url,
