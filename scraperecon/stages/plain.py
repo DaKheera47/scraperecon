@@ -39,9 +39,9 @@ def run(url: str, timeout: int) -> PlainResult:
             # We followed redirects, the final status is what matters for Open/Blocked/etc.
             # But the spec says "200-299 => OPEN, 301.. => REDIRECTED". If we follow redirects, 
             # we might just return the final status. Let's return the final status verdict.
-            verdict = get_verdict(resp.status_code, body_preview)
+            verdict = get_verdict(resp.status_code, resp.text)
         else:
-            verdict = get_verdict(resp.status_code, body_preview)
+            verdict = get_verdict(resp.status_code, resp.text)
             
         return PlainResult(
             verdict=verdict,

@@ -40,7 +40,7 @@ def print_human(report: ReconReport):
     console.print()
     
     # Stage 1
-    console.print("[bold]Stage 1 — Plain HTTP[/bold]")
+    console.print("[bold]Stage 1 — Plain HTTP (httpx, scraper User-Agent)[/bold]")
     if report.plain.error:
         err_console.print(f"  [red]Error:[/red] {report.plain.error}")
         console.print("  Verdict:  ", format_verdict(report.plain.verdict))
