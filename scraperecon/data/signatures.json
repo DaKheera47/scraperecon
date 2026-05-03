@@ -1,0 +1,61 @@
+{
+  "vendors": [
+    {
+      "name": "Cloudflare",
+      "signals": [
+        { "type": "header_present", "key": "cf-ray", "weight": 0.6 },
+        { "type": "cookie_name", "value": "__cf_bm", "weight": 0.3 },
+        { "type": "cookie_name", "value": "cf_clearance", "weight": 0.3 },
+        { "type": "header_value", "key": "server", "value": "cloudflare", "weight": 0.2 },
+        { "type": "body_contains", "value": "cf-browser-verification", "weight": 0.4 },
+        { "type": "body_contains", "value": "challenges.cloudflare.com", "weight": 0.5 }
+      ]
+    },
+    {
+      "name": "DataDome",
+      "signals": [
+        { "type": "cookie_name", "value": "datadome", "weight": 0.8 },
+        { "type": "header_present", "key": "x-datadome-cid", "weight": 0.5 },
+        { "type": "body_contains", "value": "datadome", "weight": 0.4 }
+      ]
+    },
+    {
+      "name": "Akamai",
+      "signals": [
+        { "type": "cookie_name", "value": "_abck", "weight": 0.7 },
+        { "type": "cookie_name", "value": "bm_sz", "weight": 0.5 },
+        { "type": "header_present", "key": "x-akamai-edgescape", "weight": 0.4 }
+      ]
+    },
+    {
+      "name": "PerimeterX",
+      "signals": [
+        { "type": "cookie_name", "value": "_px", "weight": 0.6 },
+        { "type": "cookie_name", "value": "_pxhd", "weight": 0.4 },
+        { "type": "body_contains", "value": "px-captcha", "weight": 0.5 }
+      ]
+    },
+    {
+      "name": "Kasada",
+      "signals": [
+        { "type": "header_present", "key": "x-kasada-pow", "weight": 0.8 },
+        { "type": "body_contains", "value": "kasada", "weight": 0.5 }
+      ]
+    },
+    {
+      "name": "Imperva",
+      "signals": [
+        { "type": "cookie_name", "value": "incap_ses", "weight": 0.6 },
+        { "type": "cookie_name", "value": "visid_incap", "weight": 0.5 },
+        { "type": "header_present", "key": "x-iinfo", "weight": 0.4 }
+      ]
+    },
+    {
+      "name": "AWS WAF",
+      "signals": [
+        { "type": "cookie_name", "value": "aws-waf-token", "weight": 0.8 },
+        { "type": "body_contains", "value": "awswaf", "weight": 0.5 }
+      ]
+    }
+  ]
+}
