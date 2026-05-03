@@ -1,6 +1,7 @@
 import time
 import httpx
 from ..types import PlainResult, Verdict
+from ..utils import is_challenge_body
 
 DEFAULT_HEADERS = {
     "User-Agent": "Mozilla/5.0 (compatible; scraperecon/0.1)",
@@ -8,7 +9,9 @@ DEFAULT_HEADERS = {
     "Accept-Language": "en-US,en;q=0.5"
 }
 
-def get_verdict(status: int) -> Verdict:
+def get_verdict(status: int, body_preview: str = "") -> Verdict:
+    if is_challenge_body(body_preview):
+        return Verdict.BLOCKED
     if 200 <= status <= 299:
         return Verdict.OPEN
     elif status in (301, 302, 307, 308):
@@ -36,9 +39,9 @@ def run(url: str, timeout: int) -> PlainResult:
             # We followed redirects, the final status is what matters for Open/Blocked/etc.
             # But the spec says "200-299 => OPEN, 301.. => REDIRECTED". If we follow redirects, 
             # we might just return the final status. Let's return the final status verdict.
-            verdict = get_verdict(resp.status_code)
+            verdict = get_verdict(resp.status_code, body_preview)
         else:
-            verdict = get_verdict(resp.status_code)
+            verdict = get_verdict(resp.status_code, body_preview)
             
         return PlainResult(
             verdict=verdict,
