@@ -32,10 +32,10 @@ def run(url: str, plain_result: PlainResult, profile: str, timeout: int) -> TlsR
         cookies = list(resp.cookies.keys())
         body_preview = resp.text[:2048]
         
-        verdict = get_verdict(resp.status_code)
+        verdict = get_verdict(resp.status_code, body_preview)
         
         tls_was_blocker = False
-        if plain_result.verdict == Verdict.BLOCKED and verdict == Verdict.OPEN:
+        if plain_result.verdict in (Verdict.BLOCKED, Verdict.CHALLENGED) and verdict == Verdict.OPEN:
             tls_was_blocker = True
             
         return TlsResult(
@@ -46,7 +46,8 @@ def run(url: str, plain_result: PlainResult, profile: str, timeout: int) -> TlsR
             cookies=cookies,
             body_preview=body_preview,
             tls_was_blocker=tls_was_blocker,
-            profile_used=profile
+            profile_used=profile,
+            full_body=resp.text
         )
     except Exception as e:
         response_time_ms = int((time.perf_counter() - start_time) * 1000)

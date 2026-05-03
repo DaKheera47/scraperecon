@@ -22,6 +22,8 @@ def format_verdict(verdict: Verdict) -> Text:
         return Text("Open", style="bold green")
     elif verdict == Verdict.BLOCKED:
         return Text("Blocked", style="bold red")
+    elif verdict == Verdict.CHALLENGED:
+        return Text("Challenged", style="bold magenta")
     elif verdict in (Verdict.UNCERTAIN, Verdict.SKIPPED):
         return Text(verdict.value, style="bold yellow")
     elif verdict == Verdict.ERROR:
@@ -180,6 +182,7 @@ def main(
     json_out: bool = typer.Option(False, "--json", help="Output machine-readable JSON"),
     skip_tls: bool = typer.Option(False, "--skip-tls", help="Skip stage 2"),
     skip_vendor: bool = typer.Option(False, "--skip-vendor", help="Skip stage 3"),
+    save: bool = typer.Option(False, "--save", help="Save the full HTML responses to local files"),
     version: bool = typer.Option(False, "--version", help="Print version")
 ):
     if version:
@@ -201,6 +204,27 @@ def main(
         print_json(report)
     else:
         print_human(report)
-
+        
+    if save:
+        from urllib.parse import urlparse
+        domain = urlparse(report.target).netloc or "target"
+        domain = domain.replace(":", "_")
+        
+        console = Console()
+        console.print()
+        console.print("[bold]Saved Files[/bold]")
+        
+        if report.plain and not report.plain.error and report.plain.full_body:
+            fname = f"{domain}_stage1.html"
+            with open(fname, "w", encoding="utf-8") as f:
+                f.write(report.plain.full_body)
+            console.print(f"  [green]Stage 1 saved to:[/green] {fname}")
+            
+        if report.tls and report.tls.verdict not in (Verdict.SKIPPED, Verdict.ERROR) and report.tls.full_body:
+            fname = f"{domain}_stage2.html"
+            with open(fname, "w", encoding="utf-8") as f:
+                f.write(report.tls.full_body)
+            console.print(f"  [green]Stage 2 saved to:[/green] {fname}")
+        
 if __name__ == "__main__":
     app()

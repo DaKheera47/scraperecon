@@ -19,9 +19,9 @@ def build_recommendation(
     elif tls and tls.tls_was_blocker:
         use_tls_impersonation = True
         profile = tls.profile_used
-    elif plain.verdict == Verdict.BLOCKED and tls and tls.verdict == Verdict.BLOCKED:
+    elif plain.verdict in (Verdict.BLOCKED, Verdict.CHALLENGED) and tls and tls.verdict in (Verdict.BLOCKED, Verdict.CHALLENGED):
         use_tls_impersonation = True
-        notes.append("Both stages blocked: may need browser automation (Playwright + stealth)")
+        notes.append("Both stages blocked/challenged: may need browser automation (Playwright + stealth)")
         
     if vendor and vendor.vendor == "Cloudflare":
         notes.append("Cloudflare detected: consider Playwright + stealth plugin if curl_cffi fails")

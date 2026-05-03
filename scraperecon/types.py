@@ -5,6 +5,7 @@ from typing import Optional
 class Verdict(Enum):
     OPEN = "Open"
     BLOCKED = "Blocked"
+    CHALLENGED = "Challenged"
     REDIRECTED = "Redirected"
     UNCERTAIN = "Uncertain"
     SKIPPED = "Skipped"
@@ -30,6 +31,7 @@ class PlainResult:
     cookies: list[str]
     body_preview: str
     final_url: str
+    full_body: str = ""
     error: Optional[str] = None
 
 @dataclass
@@ -42,6 +44,7 @@ class TlsResult:
     body_preview: str
     tls_was_blocker: bool
     profile_used: str
+    full_body: str = ""
     error: Optional[str] = None
 
 @dataclass

@@ -11,7 +11,7 @@ DEFAULT_HEADERS = {
 
 def get_verdict(status: int, body_preview: str = "") -> Verdict:
     if is_challenge_body(body_preview):
-        return Verdict.BLOCKED
+        return Verdict.CHALLENGED
     if 200 <= status <= 299:
         return Verdict.OPEN
     elif status in (301, 302, 307, 308):
@@ -50,7 +50,8 @@ def run(url: str, timeout: int) -> PlainResult:
             headers=headers,
             cookies=cookies,
             body_preview=body_preview,
-            final_url=final_url
+            final_url=final_url,
+            full_body=resp.text
         )
     except Exception as e:
         response_time_ms = int((time.perf_counter() - start_time) * 1000)
