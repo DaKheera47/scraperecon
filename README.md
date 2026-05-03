@@ -4,7 +4,9 @@ Run this before you write a scraper. It tells you what bot protection a site has
 
 <img width="1117" height="409" alt="image" src="https://github.com/user-attachments/assets/aa7d0670-c612-4cfb-a579-b610b9c04163" />
 
+<br/>
 
+## Usage
 
 ```bash
 scraperecon https://target.com
