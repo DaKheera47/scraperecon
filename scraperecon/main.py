@@ -11,8 +11,7 @@ app = typer.Typer(add_completion=False)
 SUPPORTED_IMPERSONATION_PROFILES = (
     "chrome131",
     "chrome120",
-    "firefox120",
-    "safari17",
+    "safari170",
 )
 
 def validate_impersonation_profile(value: str) -> str:
@@ -199,7 +198,7 @@ def main(
         "chrome131",
         "--impersonate",
         callback=validate_impersonation_profile,
-        help="TLS profile for stage 2",
+        help="TLS profile for stage 2: chrome131, chrome120, safari170",
     ),
     timeout: int = typer.Option(10, "--timeout", help="Per-request timeout in seconds"),
     json_out: bool = typer.Option(False, "--json", help="Output machine-readable JSON"),

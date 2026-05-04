@@ -81,7 +81,7 @@ pipx install scraperecon
 scraperecon https://target.com
 scraperecon https://target.com --probe-rate
 scraperecon https://target.com --probe-rate --concurrency 10 --requests 50
-scraperecon https://target.com --impersonate firefox120
+scraperecon https://target.com --impersonate safari170
 scraperecon https://target.com --save
 scraperecon https://target.com --json | jq .recommendation
 
@@ -90,7 +90,7 @@ scraperecon https://target.com --json | jq .recommendation
 | `--probe-rate`  | off       | Run Stage 4 rate limit probe                                                         |
 | `--concurrency` | 5         | Workers for rate probe                                                               |
 | `--requests`    | 20        | Total requests for rate probe                                                        |
-| `--impersonate` | chrome131 | TLS profile for Stage 2. Options: `chrome131`, `chrome120`, `firefox120`, `safari17` |
+| `--impersonate` | chrome131 | TLS profile for Stage 2. Options: `chrome131`, `chrome120`, `safari170` |
 | `--timeout`     | 10        | Per-request timeout in seconds                                                       |
 | `--json`        | off       | Machine-readable JSON output                                                         |
 | `--save`        | off       | Save the full HTML responses to local files (`<domain>_stage1.html`, etc.)           |
