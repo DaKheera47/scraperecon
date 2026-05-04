@@ -1,4 +1,3 @@
-import sys
 import json
 import dataclasses
 from enum import Enum
@@ -9,6 +8,20 @@ from .pipeline import run_pipeline
 from .types import ReconReport, Verdict, Confidence
 
 app = typer.Typer(add_completion=False)
+SUPPORTED_IMPERSONATION_PROFILES = (
+    "chrome131",
+    "chrome120",
+    "firefox120",
+    "safari17",
+)
+
+def validate_impersonation_profile(value: str) -> str:
+    if value not in SUPPORTED_IMPERSONATION_PROFILES:
+        choices = ", ".join(SUPPORTED_IMPERSONATION_PROFILES)
+        raise typer.BadParameter(
+            f"Unsupported TLS profile '{value}'. Choose one of: {choices}."
+        )
+    return value
 
 def _default_json(obj):
     if isinstance(obj, Enum):
@@ -182,7 +195,12 @@ def main(
     probe_rate: bool = typer.Option(False, "--probe-rate", help="Run stage 4 (rate limit probe)"),
     concurrency: int = typer.Option(5, "--concurrency", help="Workers for rate probe"),
     requests: int = typer.Option(20, "--requests", help="Total requests for rate probe"),
-    impersonate: str = typer.Option("chrome131", "--impersonate", help="TLS profile for stage 2"),
+    impersonate: str = typer.Option(
+        "chrome131",
+        "--impersonate",
+        callback=validate_impersonation_profile,
+        help="TLS profile for stage 2",
+    ),
     timeout: int = typer.Option(10, "--timeout", help="Per-request timeout in seconds"),
     json_out: bool = typer.Option(False, "--json", help="Output machine-readable JSON"),
     skip_tls: bool = typer.Option(False, "--skip-tls", help="Skip stage 2"),
