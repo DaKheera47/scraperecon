@@ -178,7 +178,7 @@ def version_callback(value: bool):
 
 @app.command()
 def main(
-    url: str = typer.Argument(None, help="Target URL"),
+    url: str = typer.Argument(..., help="Target URL"),
     probe_rate: bool = typer.Option(False, "--probe-rate", help="Run stage 4 (rate limit probe)"),
     concurrency: int = typer.Option(5, "--concurrency", help="Workers for rate probe"),
     requests: int = typer.Option(20, "--requests", help="Total requests for rate probe"),
@@ -190,10 +190,6 @@ def main(
     save: bool = typer.Option(False, "--save", help="Save the full HTML responses to local files"),
     version: bool = typer.Option(None, "--version", callback=version_callback, is_eager=True, help="Print version")
 ):
-    if not url:
-        print("Usage: scraperecon [OPTIONS] URL\nTry 'scraperecon --help' for help.\n\nError: Missing argument 'URL'.", file=sys.stderr)
-        raise typer.Exit(1)
-        
     report = run_pipeline(
         url=url,
         probe_rate=probe_rate,
