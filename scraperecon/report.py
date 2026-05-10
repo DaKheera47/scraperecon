@@ -1,11 +1,12 @@
 from typing import Optional
-from .types import Recommendation, ReconReport, PlainResult, TlsResult, VendorResult, RateLimitResult, Verdict, BlockType
+from .types import Recommendation, PlainResult, TlsResult, VendorResult, RateLimitResult, RobotsResult, Verdict
 
 def build_recommendation(
     plain: PlainResult,
     tls: Optional[TlsResult],
     vendor: Optional[VendorResult],
-    rate: Optional[RateLimitResult]
+    rate: Optional[RateLimitResult],
+    robots: Optional[RobotsResult] = None
 ) -> Recommendation:
     
     use_tls_impersonation = False
@@ -28,6 +29,9 @@ def build_recommendation(
         
     if rate and rate.block_type is not None:
         proxy_recommended = True
+
+    if robots and robots.blocked:
+        notes.append("robots.txt blocks scraping, proceed at own caution")
         
     body_to_check = ""
     if tls and tls.verdict not in (Verdict.SKIPPED, Verdict.ERROR):

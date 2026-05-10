@@ -1,5 +1,5 @@
 import asyncio
-from .stages import plain, tls, vendor, ratelimit
+from .stages import plain, robots, tls, vendor, ratelimit
 from .report import build_recommendation
 from .types import ReconReport
 
@@ -13,6 +13,8 @@ def run_pipeline(
     skip_tls: bool,
     skip_vendor: bool
 ) -> ReconReport:
+
+    robots_res = robots.run(url, timeout)
 
     # Stage 1
     plain_res = plain.run(url, timeout)
@@ -37,10 +39,11 @@ def run_pipeline(
     else:
         rate_res = None
         
-    rec = build_recommendation(plain_res, tls_res, vendor_res, rate_res)
+    rec = build_recommendation(plain_res, tls_res, vendor_res, rate_res, robots_res)
     
     return ReconReport(
         target=url,
+        robots=robots_res,
         plain=plain_res,
         tls=tls_res,
         vendor=vendor_res,

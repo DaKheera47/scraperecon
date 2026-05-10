@@ -23,6 +23,12 @@ class BlockType(Enum):
     SILENT = "Silent"
 
 @dataclass
+class RobotsResult:
+    blocked: bool
+    robots_url: str
+    error: Optional[str] = None
+
+@dataclass
 class PlainResult:
     verdict: Verdict
     status: Optional[int]
@@ -75,6 +81,7 @@ class Recommendation:
 @dataclass
 class ReconReport:
     target: str
+    robots: Optional[RobotsResult]
     plain: Optional[PlainResult]
     tls: Optional[TlsResult]
     vendor: Optional[VendorResult]

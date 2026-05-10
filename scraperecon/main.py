@@ -135,6 +135,7 @@ def print_json(report: ReconReport):
     out = {
         "target": report.target,
         "stages": {
+            "robots": None,
             "plain": None,
             "tls": None,
             "vendor": None,
@@ -142,6 +143,14 @@ def print_json(report: ReconReport):
         },
         "recommendation": dataclasses.asdict(report.recommendation)
     }
+
+    if report.robots:
+        out["stages"]["robots"] = {
+            "blocked": report.robots.blocked,
+            "robots_url": report.robots.robots_url,
+        }
+        if report.robots.error:
+            out["stages"]["robots"]["error"] = report.robots.error
     
     if report.plain:
         out["stages"]["plain"] = {

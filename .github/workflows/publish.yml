@@ -27,8 +27,43 @@ jobs:
       - name: Install pypa/build
         run: python -m pip install --upgrade pip build
 
+      - name: Sync package version from release tag
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          python - <<'PY'
+          import os
+          import pathlib
+          import re
+
+          tag = os.environ["RELEASE_TAG"].strip()
+          match = re.fullmatch(r"v?(\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?)", tag)
+          if not match:
+              raise SystemExit(
+                  f"Release tag '{tag}' is invalid. Expected semver like v0.1.1 or 0.1.1."
+              )
+
+          version = match.group(1)
+          pyproject_path = pathlib.Path("pyproject.toml")
+          content = pyproject_path.read_text(encoding="utf-8")
+
+          updated, count = re.subn(
+              r'(?m)^version\s*=\s*"[^"]+"$',
+              f'version = "{version}"',
+              content,
+              count=1,
+          )
+          if count != 1:
+              raise SystemExit("Could not update version in pyproject.toml")
+
+          pyproject_path.write_text(updated, encoding="utf-8")
+          print(f"Updated pyproject.toml version to {version}")
+          PY
+
       - name: Build distribution
         run: python -m build
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          skip-existing: true
