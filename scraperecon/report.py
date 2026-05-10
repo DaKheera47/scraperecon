@@ -30,9 +30,6 @@ def build_recommendation(
     if rate and rate.block_type is not None:
         proxy_recommended = True
 
-    if robots and robots.blocked:
-        notes.append("robots.txt blocks scraping, proceed at own caution")
-        
     body_to_check = ""
     if tls and tls.verdict not in (Verdict.SKIPPED, Verdict.ERROR):
         body_to_check = tls.body_preview.lower()

@@ -50,6 +50,29 @@ def print_human(report: ReconReport):
     console.print(f"[bold]scraperecon v0.1.0[/bold] — {report.target}")
     console.print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
     console.print()
+
+    # Scrape report
+    console.print("[bold]Scrape Report[/bold]")
+    if report.robots:
+        console.print(f"  robots.txt: {report.robots.robots_url}")
+        if report.robots.blocked:
+            console.print("  [yellow]robots.txt blocks scraping, proceed at own caution[/yellow]")
+        else:
+            console.print("  robots.txt does not block this path")
+
+        if report.robots.sitemaps_checked:
+            console.print(
+                f"  Sitemap:    {report.robots.sitemap_url_count} URLs across "
+                f"{report.robots.sitemaps_checked} sitemap file(s)"
+            )
+        else:
+            console.print("  Sitemap:    No sitemap URLs found")
+
+        if report.robots.error:
+            err_console.print(f"  [red]Scrape report error:[/red] {report.robots.error}")
+    else:
+        console.print("  [yellow]Unavailable[/yellow]")
+    console.print()
     
     # Stage 1
     console.print("[bold]Stage 1 — Plain HTTP (httpx, scraper User-Agent)[/bold]")
@@ -134,8 +157,8 @@ def print_json(report: ReconReport):
     # Map to the requested JSON format
     out = {
         "target": report.target,
+        "scrape_report": None,
         "stages": {
-            "robots": None,
             "plain": None,
             "tls": None,
             "vendor": None,
@@ -145,12 +168,15 @@ def print_json(report: ReconReport):
     }
 
     if report.robots:
-        out["stages"]["robots"] = {
+        out["scrape_report"] = {
             "blocked": report.robots.blocked,
             "robots_url": report.robots.robots_url,
+            "sitemap_url_count": report.robots.sitemap_url_count,
+            "sitemaps_checked": report.robots.sitemaps_checked,
+            "sitemap_sources": report.robots.sitemap_sources,
         }
         if report.robots.error:
-            out["stages"]["robots"]["error"] = report.robots.error
+            out["scrape_report"]["error"] = report.robots.error
     
     if report.plain:
         out["stages"]["plain"] = {
