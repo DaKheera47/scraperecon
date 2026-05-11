@@ -16,6 +16,11 @@ scraperecon https://target.com
 scraperecon — https://target.com
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+Scrape Report
+  robots.txt: https://target.com/robots.txt
+  robots.txt blocks scraping, proceed at own caution
+  Sitemap:    12,843 URLs across 4 sitemap file(s)
+
 Stage 1 — Plain HTTP (httpx, scraper User-Agent)
   Status:   403 Forbidden
   Time:     212ms
@@ -45,7 +50,17 @@ Recommendation
 
 ## What it does
 
-scraperecon runs four stages against a URL in order, stopping early where it can.
+scraperecon starts with a scrape report, then runs four stages against a URL in order, stopping early where it can.
+
+**Scrape Report**
+
+Fetches `robots.txt` before the network challenge stages. If the target path is disallowed for generic crawlers, scraperecon prints:
+
+```text
+robots.txt blocks scraping, proceed at own caution
+```
+
+It also discovers sitemap URLs from `robots.txt`, falls back to `/sitemap.xml` when needed, follows sitemap indexes recursively, and counts the number of page URLs found. This is useful for sizing a site before you write a scraper.
 
 **Stage 1 — Plain HTTP**
 
@@ -84,6 +99,7 @@ scraperecon https://target.com --probe-rate --concurrency 10 --requests 50
 scraperecon https://target.com --impersonate safari170
 scraperecon https://target.com --save
 scraperecon https://target.com --json | jq .recommendation
+```
 
 | Flag            | Default   | Description                                                                          |
 | --------------- | --------- | ------------------------------------------------------------------------------------ |
@@ -111,6 +127,34 @@ At the end of every run you get a plain-English recommendation based on what was
 
 ---
 
+## JSON output
+
+Pass `--json` to get machine-readable output. Robots and sitemap data live under `scrape_report`, before the stage results.
+
+```json
+{
+  "target": "https://target.com",
+  "scrape_report": {
+    "blocked": true,
+    "robots_url": "https://target.com/robots.txt",
+    "sitemap_url_count": 12843,
+    "sitemaps_checked": 4,
+    "sitemap_sources": [
+      "https://target.com/sitemap.xml",
+      "https://target.com/sitemap_0.xml"
+    ]
+  },
+  "stages": {
+    "plain": {},
+    "tls": {},
+    "vendor": {},
+    "rate_limit": null
+  }
+}
+```
+
+---
+
 ## Adding vendor signatures
 
 Signatures live in `scraperecon/data/signatures.json`. It's a flat JSON file — no code required. If you know a signal that's missing, open a PR.
@@ -131,7 +175,7 @@ Signal types: `header_present`, `header_value`, `cookie_name`, `body_contains`, 
 
 ## What it won't do
 
-scraperecon is a recon tool, not a scraping library. It tells you what you need — it doesn't do it for you. No CAPTCHA solving, no Playwright integration, no proxy support, no persistent history.
+scraperecon is a recon tool, not a scraping library. It tells you what you need — it doesn't do it for you. No CAPTCHA solving, no Playwright integration, no proxy support, no persistent history, and no crawling page URLs from sitemap results.
 
 ---
 
