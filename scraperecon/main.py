@@ -139,6 +139,7 @@ def print_human(report: ReconReport):
     pattern_table.add_column("Pattern", style="cyan", no_wrap=True)
     pattern_table.add_column("Detected", no_wrap=True)
     pattern_table.add_column("Signal", overflow="fold")
+    pattern_table.add_column("Keys", overflow="fold")
     pattern_table.add_column("Why It Matters", overflow="fold")
 
     _, pattern_source = detect_scrapable_patterns(report.plain, report.tls)
@@ -152,6 +153,7 @@ def print_human(report: ReconReport):
             escape(item.name),
             status,
             escape(item.signal),
+            escape(item.keys_summary) if item.keys_summary else "[dim]-[/dim]",
             escape(item.extraction_hint),
         )
     console.print(pattern_table)

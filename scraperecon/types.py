@@ -87,6 +87,7 @@ class ScrapablePatternResult:
     detected: bool
     signal: str
     extraction_hint: str
+    keys_summary: str = ""
 
 @dataclass
 class ReconReport:

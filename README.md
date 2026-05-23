@@ -41,17 +41,17 @@ Stage 4 — Rate Limit Probe
   Skipped (pass --probe-rate to enable)
 
 Embedded Data Patterns (2/5 detected in Stage 2 (chrome131))
-Pattern                 Detected  Signal                                     Why It Matters
-JSON-LD                 Yes       script[type="application/ld+json"]         Parse schema payloads for product,
-                                                                            article, job, or org fields.
-Next.js hydration       Yes       script#__NEXT_DATA__                       Read props/pageProps from the
-                                                                            Next.js bootstrap JSON.
-Nuxt payload            No        window.__NUXT__ or data-nuxt-data          Inspect the Nuxt payload for
-                                                                            server-rendered entities and route data.
-Apollo/Relay cache      No        window.__APOLLO_STATE__ or                 Extract normalized GraphQL entities
-                                  __RELAY_PAYLOADS__                         from the hydrated client cache.
-Bootstrapped app state  No        window.__INITIAL_STATE__ or                Mine the initial Redux-style store
-                                  __PRELOADED_STATE__                        for records already sent to the client.
+Pattern                 Detected  Signal                              Keys                         Why It Matters
+JSON-LD                 Yes       script[type="application/ld+json"]  @context, @type, name,      Parse schema payloads for product,
+                                                                     offers, image, brand         article, job, or org fields.
+Next.js hydration       Yes       script#__NEXT_DATA__                props, page, query,         Read props/pageProps from the
+                                                                     buildId, isFallback         Next.js bootstrap JSON.
+Nuxt payload            No        window.__NUXT__ or data-nuxt-data   -                            Inspect the Nuxt payload for
+                                                                                                  server-rendered entities and route data.
+Apollo/Relay cache      No        window.__APOLLO_STATE__ or          -                            Extract normalized GraphQL entities
+                                  __RELAY_PAYLOADS__                                               from the hydrated client cache.
+Bootstrapped app state  No        window.__INITIAL_STATE__ or         -                            Mine the initial Redux-style store
+                                  __PRELOADED_STATE__                                              for records already sent to the client.
 
 Recommendation
   Use curl_cffi with chrome131 TLS profile
@@ -104,6 +104,7 @@ Checks the best HTML body it retrieved and reports five common client-visible da
 - Redux-style bootstrapped app state
 
 If any of these are present, the terminal table tells you what was found and what kind of extraction path is likely to work.
+When a payload is valid JSON, it also shows up to 7 top-level keys with a `+ n more` suffix when the object is larger.
 
 ---
 
