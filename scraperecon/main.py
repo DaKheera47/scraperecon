@@ -46,7 +46,7 @@ def format_verdict(verdict: Verdict) -> Text:
     else:
         return Text(verdict.value, style="bold")
 
-def print_human(report: ReconReport):
+def print_human(report: ReconReport, show_sitemap_preview: bool = False):
     console = Console()
     err_console = Console(stderr=True)
     
@@ -68,6 +68,15 @@ def print_human(report: ReconReport):
                 f"  Sitemap:    {report.robots.sitemap_url_count} URLs across "
                 f"{report.robots.sitemaps_checked} sitemap file(s)"
             )
+            if show_sitemap_preview and report.robots.sitemap_previews:
+                console.print("  Sitemap previews:")
+                for preview in report.robots.sitemap_previews:
+                    console.print(f"    {preview.sitemap_url}")
+                    if preview.sample_urls:
+                        for sample_url in preview.sample_urls:
+                            console.print(f"      - {sample_url}")
+                    else:
+                        console.print("      - [dim]No page URLs found in this sitemap[/dim]")
         else:
             console.print("  Sitemap:    No sitemap URLs found")
 
@@ -204,6 +213,9 @@ def print_json(report: ReconReport):
             "sitemap_url_count": report.robots.sitemap_url_count,
             "sitemaps_checked": report.robots.sitemaps_checked,
             "sitemap_sources": report.robots.sitemap_sources,
+            "sitemap_previews": [
+                dataclasses.asdict(preview) for preview in report.robots.sitemap_previews
+            ],
         }
         if report.robots.error:
             out["scrape_report"]["error"] = report.robots.error
@@ -267,6 +279,11 @@ def main(
     ),
     timeout: int = typer.Option(10, "--timeout", help="Per-request timeout in seconds"),
     json_out: bool = typer.Option(False, "--json", help="Output machine-readable JSON"),
+    show_sitemap_preview: bool = typer.Option(
+        False,
+        "--show-sitemap-preview",
+        help="Show up to 3 sample URLs for each detected sitemap in human output",
+    ),
     skip_tls: bool = typer.Option(False, "--skip-tls", help="Skip stage 2"),
     skip_vendor: bool = typer.Option(False, "--skip-vendor", help="Skip stage 3"),
     save: bool = typer.Option(False, "--save", help="Save the full HTML responses to local files"),
@@ -286,7 +303,7 @@ def main(
     if json_out:
         print_json(report)
     else:
-        print_human(report)
+        print_human(report, show_sitemap_preview=show_sitemap_preview)
         
     if save:
         from urllib.parse import urlparse

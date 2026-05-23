@@ -23,12 +23,18 @@ class BlockType(Enum):
     SILENT = "Silent"
 
 @dataclass
+class SitemapPreview:
+    sitemap_url: str
+    sample_urls: list[str] = field(default_factory=list)
+
+@dataclass
 class RobotsResult:
     blocked: bool
     robots_url: str
     sitemap_url_count: int = 0
     sitemaps_checked: int = 0
     sitemap_sources: list[str] = field(default_factory=list)
+    sitemap_previews: list[SitemapPreview] = field(default_factory=list)
     error: Optional[str] = None
 
 @dataclass

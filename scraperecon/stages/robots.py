@@ -5,9 +5,10 @@ from urllib.robotparser import RobotFileParser
 
 import httpx
 
-from ..types import RobotsResult
+from ..types import RobotsResult, SitemapPreview
 
 MAX_SITEMAPS = 100
+SITEMAP_PREVIEW_LIMIT = 3
 
 
 def _local_name(tag: str) -> str:
@@ -46,10 +47,11 @@ def _child_text(element: ET.Element, child_name: str) -> str:
 def _count_sitemap_urls(
     client: httpx.Client,
     sitemap_urls: list[str],
-) -> tuple[int, int, list[str]]:
+) -> tuple[int, int, list[str], list[SitemapPreview]]:
     seen_sitemaps = set()
     seen_urls = set()
     queue = list(dict.fromkeys(sitemap_urls))
+    sitemap_previews: list[SitemapPreview] = []
 
     while queue and len(seen_sitemaps) < MAX_SITEMAPS:
         sitemap_url = queue.pop(0)
@@ -67,6 +69,7 @@ def _count_sitemap_urls(
         except (ET.ParseError, OSError, httpx.HTTPError):
             continue
 
+        preview_urls: list[str] = []
         for element in root:
             tag_name = _local_name(element.tag)
             child_url = _child_text(element, "loc")
@@ -77,8 +80,17 @@ def _count_sitemap_urls(
                 queue.append(child_url)
             elif tag_name == "url":
                 seen_urls.add(child_url)
+                if len(preview_urls) < SITEMAP_PREVIEW_LIMIT:
+                    preview_urls.append(child_url)
 
-    return len(seen_urls), len(seen_sitemaps), sorted(seen_sitemaps)
+        sitemap_previews.append(
+            SitemapPreview(
+                sitemap_url=sitemap_url,
+                sample_urls=preview_urls,
+            )
+        )
+
+    return len(seen_urls), len(seen_sitemaps), sorted(seen_sitemaps), sitemap_previews
 
 
 def run(url: str, timeout: int) -> RobotsResult:
@@ -102,7 +114,7 @@ def run(url: str, timeout: int) -> RobotsResult:
                 blocked = False
                 sitemap_urls = [urljoin(url, "/sitemap.xml")]
 
-            sitemap_url_count, sitemaps_checked, sitemap_sources = _count_sitemap_urls(
+            sitemap_url_count, sitemaps_checked, sitemap_sources, sitemap_previews = _count_sitemap_urls(
                 client,
                 sitemap_urls,
             )
@@ -113,6 +125,7 @@ def run(url: str, timeout: int) -> RobotsResult:
             sitemap_url_count=sitemap_url_count,
             sitemaps_checked=sitemaps_checked,
             sitemap_sources=sitemap_sources,
+            sitemap_previews=sitemap_previews,
         )
     except Exception as e:
         return RobotsResult(blocked=False, robots_url=robots_url, error=str(e))

@@ -123,21 +123,23 @@ scraperecon https://target.com
 scraperecon https://target.com --probe-rate
 scraperecon https://target.com --probe-rate --concurrency 10 --requests 50
 scraperecon https://target.com --impersonate safari170
+scraperecon https://target.com --show-sitemap-preview
 scraperecon https://target.com --save
 scraperecon https://target.com --json | jq .recommendation
 ```
 
-| Flag            | Default   | Description                                                                          |
-| --------------- | --------- | ------------------------------------------------------------------------------------ |
-| `--probe-rate`  | off       | Run Stage 4 rate limit probe                                                         |
-| `--concurrency` | 5         | Workers for rate probe                                                               |
-| `--requests`    | 20        | Total requests for rate probe                                                        |
-| `--impersonate` | chrome131 | TLS profile for Stage 2. Options: `chrome131`, `chrome120`, `safari170` |
-| `--timeout`     | 10        | Per-request timeout in seconds                                                       |
-| `--json`        | off       | Machine-readable JSON output                                                         |
-| `--save`        | off       | Save the full HTML responses to local files (`<domain>_stage1.html`, etc.)           |
-| `--skip-tls`    | off       | Skip Stage 2                                                                         |
-| `--skip-vendor` | off       | Skip Stage 3                                                                         |
+| Flag                     | Default   | Description                                                                          |
+| ------------------------ | --------- | ------------------------------------------------------------------------------------ |
+| `--probe-rate`           | off       | Run Stage 4 rate limit probe                                                         |
+| `--concurrency`          | 5         | Workers for rate probe                                                               |
+| `--requests`             | 20        | Total requests for rate probe                                                        |
+| `--impersonate`          | chrome131 | TLS profile for Stage 2. Options: `chrome131`, `chrome120`, `safari170` |
+| `--timeout`              | 10        | Per-request timeout in seconds                                                       |
+| `--json`                 | off       | Machine-readable JSON output                                                         |
+| `--show-sitemap-preview` | off       | Show up to 3 sample URLs for each detected sitemap in the human-readable report      |
+| `--save`                 | off       | Save the full HTML responses to local files (`<domain>_stage1.html`, etc.)           |
+| `--skip-tls`             | off       | Skip Stage 2                                                                         |
+| `--skip-vendor`          | off       | Skip Stage 3                                                                         |
 
 ---
 
