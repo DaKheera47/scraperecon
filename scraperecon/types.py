@@ -82,6 +82,13 @@ class Recommendation:
     notes: list[str] = field(default_factory=list)
 
 @dataclass
+class ScrapablePatternResult:
+    name: str
+    detected: bool
+    signal: str
+    extraction_hint: str
+
+@dataclass
 class ReconReport:
     target: str
     robots: Optional[RobotsResult]
@@ -89,4 +96,5 @@ class ReconReport:
     tls: Optional[TlsResult]
     vendor: Optional[VendorResult]
     rate_limit: Optional[RateLimitResult]
+    scrapable_patterns: list[ScrapablePatternResult]
     recommendation: Recommendation

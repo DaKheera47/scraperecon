@@ -3,7 +3,10 @@ import dataclasses
 from enum import Enum
 import typer
 from rich.console import Console
+from rich.markup import escape
+from rich.table import Table
 from rich.text import Text
+from .patterns import detect_scrapable_patterns
 from .pipeline import run_pipeline
 from .types import ReconReport, Verdict, Confidence
 
@@ -131,6 +134,28 @@ def print_human(report: ReconReport):
     else:
         console.print("  [yellow]Skipped (pass --probe-rate to enable)[/yellow]")
     console.print()
+
+    pattern_table = Table(show_header=True, header_style="bold", box=None, pad_edge=False)
+    pattern_table.add_column("Pattern", style="cyan", no_wrap=True)
+    pattern_table.add_column("Detected", no_wrap=True)
+    pattern_table.add_column("Signal", overflow="fold")
+    pattern_table.add_column("Why It Matters", overflow="fold")
+
+    _, pattern_source = detect_scrapable_patterns(report.plain, report.tls)
+    detected_count = sum(1 for item in report.scrapable_patterns if item.detected)
+    console.print(
+        f"[bold]Embedded Data Patterns[/bold] ({detected_count}/{len(report.scrapable_patterns)} detected in {pattern_source})"
+    )
+    for item in report.scrapable_patterns:
+        status = "[green]Yes[/green]" if item.detected else "[dim]No[/dim]"
+        pattern_table.add_row(
+            escape(item.name),
+            status,
+            escape(item.signal),
+            escape(item.extraction_hint),
+        )
+    console.print(pattern_table)
+    console.print()
     
     # Recommendations
     console.print("[bold]Recommendation[/bold]")
@@ -164,6 +189,9 @@ def print_json(report: ReconReport):
             "vendor": None,
             "rate_limit": None
         },
+        "scrapable_patterns": [
+            dataclasses.asdict(pattern) for pattern in report.scrapable_patterns
+        ],
         "recommendation": dataclasses.asdict(report.recommendation)
     }
 

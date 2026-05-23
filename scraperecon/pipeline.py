@@ -1,4 +1,5 @@
 import asyncio
+from .patterns import detect_scrapable_patterns
 from .stages import plain, robots, tls, vendor, ratelimit
 from .report import build_recommendation
 from .types import ReconReport
@@ -38,6 +39,8 @@ def run_pipeline(
         ))
     else:
         rate_res = None
+
+    scrapable_patterns, _ = detect_scrapable_patterns(plain_res, tls_res)
         
     rec = build_recommendation(plain_res, tls_res, vendor_res, rate_res, robots_res)
     
@@ -48,5 +51,6 @@ def run_pipeline(
         tls=tls_res,
         vendor=vendor_res,
         rate_limit=rate_res,
+        scrapable_patterns=scrapable_patterns,
         recommendation=rec
     )
