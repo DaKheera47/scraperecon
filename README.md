@@ -41,17 +41,17 @@ Stage 4 — Rate Limit Probe
   Skipped (pass --probe-rate to enable)
 
 Embedded Data Patterns (2/5 detected in Stage 2 (chrome131))
-Pattern                 Detected  Signal                              Keys                         Why It Matters
-JSON-LD                 Yes       script[type="application/ld+json"]  @context, @type, name,      Parse schema payloads for product,
-                                                                     offers, image, brand         article, job, or org fields.
-Next.js hydration       Yes       script#__NEXT_DATA__                props, page, query,         Read props/pageProps from the
-                                                                     buildId, isFallback         Next.js bootstrap JSON.
-Nuxt payload            No        window.__NUXT__ or data-nuxt-data   -                            Inspect the Nuxt payload for
-                                                                                                  server-rendered entities and route data.
-Apollo/Relay cache      No        window.__APOLLO_STATE__ or          -                            Extract normalized GraphQL entities
-                                  __RELAY_PAYLOADS__                                               from the hydrated client cache.
-Bootstrapped app state  No        window.__INITIAL_STATE__ or         -                            Mine the initial Redux-style store
-                                  __PRELOADED_STATE__                                              for records already sent to the client.
+Pattern                 Detected  Signal                              Why It Matters
+JSON-LD                 Yes       script[type="application/ld+json"]  Parse schema payloads for product,
+                                                                      article, job, or org fields.
+Next.js hydration       Yes       script#__NEXT_DATA__                Read props/pageProps from the
+                                                                      Next.js bootstrap JSON.
+Nuxt payload            No        window.__NUXT__ or data-nuxt-data   Inspect the Nuxt payload for
+                                                                      server-rendered entities and route data.
+Apollo/Relay cache      No        window.__APOLLO_STATE__ or          Extract normalized GraphQL entities
+                                  __RELAY_PAYLOADS__                  from the hydrated client cache.
+Bootstrapped app state  No        window.__INITIAL_STATE__ or         Mine the initial Redux-style store
+                                  __PRELOADED_STATE__                 for records already sent to the client.
 
 Recommendation
   Use curl_cffi with chrome131 TLS profile
@@ -124,6 +124,7 @@ scraperecon https://target.com --probe-rate
 scraperecon https://target.com --probe-rate --concurrency 10 --requests 50
 scraperecon https://target.com --impersonate safari170
 scraperecon https://target.com --show-sitemap-preview
+scraperecon https://target.com --show-embedded-keys
 scraperecon https://target.com --save
 scraperecon https://target.com --json | jq .recommendation
 ```
@@ -137,6 +138,7 @@ scraperecon https://target.com --json | jq .recommendation
 | `--timeout`              | 10        | Per-request timeout in seconds                                                       |
 | `--json`                 | off       | Machine-readable JSON output                                                         |
 | `--show-sitemap-preview` | off       | Show up to 3 sample URLs for each detected sitemap in the human-readable report      |
+| `--show-embedded-keys`   | off       | Show parsed top-level keys for embedded data patterns in the human-readable report   |
 | `--save`                 | off       | Save the full HTML responses to local files (`<domain>_stage1.html`, etc.)           |
 | `--skip-tls`             | off       | Skip Stage 2                                                                         |
 | `--skip-vendor`          | off       | Skip Stage 3                                                                         |

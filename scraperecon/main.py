@@ -46,7 +46,11 @@ def format_verdict(verdict: Verdict) -> Text:
     else:
         return Text(verdict.value, style="bold")
 
-def print_human(report: ReconReport, show_sitemap_preview: bool = False):
+def print_human(
+    report: ReconReport,
+    show_sitemap_preview: bool = False,
+    show_embedded_keys: bool = False,
+):
     console = Console()
     err_console = Console(stderr=True)
     
@@ -148,7 +152,8 @@ def print_human(report: ReconReport, show_sitemap_preview: bool = False):
     pattern_table.add_column("Pattern", style="cyan", no_wrap=True)
     pattern_table.add_column("Detected", no_wrap=True)
     pattern_table.add_column("Signal", overflow="fold")
-    pattern_table.add_column("Keys", overflow="fold")
+    if show_embedded_keys:
+        pattern_table.add_column("Keys", overflow="fold")
     pattern_table.add_column("Why It Matters", overflow="fold")
 
     _, pattern_source = detect_scrapable_patterns(report.plain, report.tls)
@@ -158,13 +163,15 @@ def print_human(report: ReconReport, show_sitemap_preview: bool = False):
     )
     for item in report.scrapable_patterns:
         status = "[green]Yes[/green]" if item.detected else "[dim]No[/dim]"
-        pattern_table.add_row(
+        row = [
             escape(item.name),
             status,
             escape(item.signal),
-            escape(item.keys_summary) if item.keys_summary else "[dim]-[/dim]",
-            escape(item.extraction_hint),
-        )
+        ]
+        if show_embedded_keys:
+            row.append(escape(item.keys_summary) if item.keys_summary else "[dim]-[/dim]")
+        row.append(escape(item.extraction_hint))
+        pattern_table.add_row(*row)
     console.print(pattern_table)
     console.print()
     
@@ -284,6 +291,11 @@ def main(
         "--show-sitemap-preview",
         help="Show up to 3 sample URLs for each detected sitemap in human output",
     ),
+    show_embedded_keys: bool = typer.Option(
+        False,
+        "--show-embedded-keys",
+        help="Show parsed top-level keys for detected embedded data patterns in human output",
+    ),
     skip_tls: bool = typer.Option(False, "--skip-tls", help="Skip stage 2"),
     skip_vendor: bool = typer.Option(False, "--skip-vendor", help="Skip stage 3"),
     save: bool = typer.Option(False, "--save", help="Save the full HTML responses to local files"),
@@ -303,7 +315,11 @@ def main(
     if json_out:
         print_json(report)
     else:
-        print_human(report, show_sitemap_preview=show_sitemap_preview)
+        print_human(
+            report,
+            show_sitemap_preview=show_sitemap_preview,
+            show_embedded_keys=show_embedded_keys,
+        )
         
     if save:
         from urllib.parse import urlparse
